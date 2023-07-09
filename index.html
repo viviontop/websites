@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="Growguesser" content="Geogusser for Growtopia">
+    <meta name="keywords" content="growtopia, growguesser, growtopia.dev">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growguesser by vivi</title>
+    <style>
+        #rulesButton {
+            margin-top: 0px;
+        }
+
+        body {
+            background-color: rgb(76, 0, 139);
+            color: white;
+        }
+
+        #container {
+            text-align: center;
+            margin-top: 1px;
+        }
+
+        #hint {
+            margin-bottom: 20px;
+        }
+
+        #hintImageContainer {
+            height: 510px;
+            overflow: hidden;
+        }
+
+        #hintImage {
+            width: 950px;
+        }
+
+        #score {
+            font-size: 24px;
+        }
+
+        #hintDisplay {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #hintButton {
+            margin-bottom: 10px;
+        }
+
+        #rulesButton {
+            margin-top: 0px;
+        }
+
+        #rulesModal {
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .close {
+            color: black;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: red;
+        }
+        .instagram-icon {
+    margin-top: -5px; /* Adjust this value to move the icon up or down */
+  }
+    </style>
+</head>
+<body>
+    <button id="rulesButton" onclick="showRules()">Max 5 guesses
+    and 5 hints(1 let 1 hint,2 let 2 hints, etc)</button>
+    <div id="rulesModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRules()">&times;</span>
+            <h2>Rules</h2>
+            <p>1. Guess the world based on the given image.</p>
+            <p>2. Enter your guess in the input field.</p>
+            <p>3. Click the "Submit" button to check your guess.</p>
+            <p>4. Use the "Hint" button to reveal hints about the world.</p>
+            <p>5. You have 5 tries to guess the word correctly, 3 hints if the world's name is more than 2 letters,
+                2 hints if the world's name is 2 letters long and 1 hint if the world's 1 letter.</p>
+            <p>6. Each correct guess earns you 1 point.</p>
+            <p>7. Enjoy the game!</p>
+        </div>
+    </div>
+
+    <div id="container">
+        <h1>Guess the World</h1>
+        <div id="hint">
+            <div id="hintImageContainer">
+                <img id="hintImage" src="" alt="Hint Image">
+            </div>
+        </div>
+        <input type="text" id="guessInput" placeholder="Enter your guess">
+        <button onclick="checkGuess()">Submit</button>
+        <div id="score">Score: 0</div>
+        <button id="hintButton" onclick="showHint()">Hint</button>
+        <div id="hintDisplay"></div>
+    </div>
+
+    <script>
+        var wordList = [
+        {
+                word: "Set",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/set.png"
+            },
+            {
+                word: "Sellset",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/sellset.png"
+            },
+            {
+                word: "Buysuper",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buysuper.png"
+            },
+            {
+                word: "Buylight",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buylight.png"
+            },
+            {
+                word: "Buycape",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buycape.png"
+            },
+            {
+                word: "Buywing",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buywing.png"
+            },
+            {
+                word: "Seeds",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/seeds.png"
+            },
+            {
+                word: "Spend",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/spend.png"
+            },
+            {
+                word: "Reich",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/reich.png"
+            },
+            {
+                word: "Mamasb",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/mamasb.png"
+            },
+            {
+                word: "Papisb",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/papisb.png"
+            },
+            {
+                word: "Dumb",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/dumb.png"
+            },
+            {
+                word: "Ev",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/ev.png"
+            },
+            {
+                word: "Buytractor",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buytractor.png"
+            },
+            {
+                word: "name",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/name.png"
+            },            {
+                word: "sell",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/sell.png"
+            },            {
+                word: "trade",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/trade.png"
+            },            {
+                word: "buyghc",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buyghc.png"
+            },            {
+                word: "a",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/a.png"
+            },{
+word: "zohros",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/zohros.png"
+},{
+word: "seeds",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/seeds.png"
+},{
+word: "caitriona",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/caitriona.png"
+},{
+word: "misthios",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/misthios.png"
+},{
+word: "fournos",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/fournos.png"
+},{
+word: "windyplay",
+image: "https://s3.amazonaws.com/world.growtopiagame.com/windyplay.png"
+},
+{
+    word: "coconutshrimp",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/coconutshrimp.png"
+},
+{
+    word: "akrius",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/akrius.png"
+},
+{
+    word: "rimanah",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/rimanah.png"
+},
+{
+    word: "hamumutown",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/hamumutown.png"
+},
+{
+    word: "elbanna",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/elbanna.png"
+},
+{
+    word: "anarion",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/anarion.png"
+},
+{
+    word: "sadilus",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/sadilus.png"
+},
+{
+    word: "solarex",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/solarex.png"
+}
+{
+    word: "casino",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/casino.png"
+},
+{
+    word: "hollowdragon",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/hollowdragon.png"
+},
+{
+    word: "xialios",
+    image: "https://s3.amazonaws.com/world.growtopiagame.com/xialios.png"
+}
+{
+                word: "sets",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/sets.png"
+            },
+            {
+                word: "buyriding",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buyriding.png"
+            },
+            {
+                word: "donate",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/donate.png"
+            },
+            {
+                word: "noob",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/noob.png"
+            },
+            {
+                word: "love",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/love.png"
+            },
+            {
+                word: "Date",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/date.png"
+            },
+            {
+                word: "Buyiotm",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/buyiotm.png"
+            },
+            {
+                word: "jamew7",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/jamew7.png"
+            },
+            {
+                word: "pinuski",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/pinuski.png"
+            },
+            {
+                word: "lenrogt",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/lenrogt.png"
+            },
+            {
+                word: "smirky",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/smirky.png"
+            },
+            {
+                word: "abcd",
+                image: "https://s3.amazonaws.com/world.growtopiagame.com/abcd.png"
+            }
+        ];
+
+        var tries = 0;
+var maxTries = 5;
+var randomIndex = Math.floor(Math.random() * wordList.length);
+var randomWord = wordList[randomIndex].word;
+var randomImage = wordList[randomIndex].image;
+var score = 0;
+var hintCounter = randomWord.length > 5 ? 5 : randomWord.length;
+var hintDisplay = document.getElementById("hintDisplay");
+
+document.getElementById("hintImage").src = randomImage;
+updateScore();
+
+function checkGuess() {
+    var guess = document.getElementById("guessInput").value.toLowerCase(); // Convert guess to lowercase
+    if (guess === randomWord.toLowerCase()) { // Convert randomWord to lowercase
+        alert("Congratulations! You guessed the world correctly.");
+        score++;
+        updateScore();
+        nextWord();
+    } else {
+        tries++;
+        if (tries === maxTries) {
+            location.reload();
+        } else {
+            alert("Sorry, that's not the correct world. Please try again.");
+        }
+    }
+}
+
+function nextWord() {
+    tries = 0;
+    randomIndex = Math.floor(Math.random() * wordList.length);
+    randomWord = wordList[randomIndex].word;
+    randomImage = wordList[randomIndex].image;
+    document.getElementById("hintImage").src = randomImage;
+    document.getElementById("guessInput").value = "";
+    hintCounter = randomWord.length > 5 ? 5 : randomWord.length;
+    hintDisplay.textContent = "";
+    document.getElementById("hintButton").disabled = false;
+}
+
+function updateScore() {
+    document.getElementById("score").textContent = "Score: " + score;
+}
+
+function showHint() {
+    if (hintCounter > 0 && hintDisplay.textContent === "") {
+        var hint = "_ ".repeat(randomWord.length);
+        hintDisplay.textContent = "" + hint;
+    } else if (hintCounter > 0 && hintDisplay.textContent.includes("_")) {
+        var hiddenIndexes = [];
+        var hintArray = hintDisplay.textContent.split(" ");
+        for (var i = 0; i < hintArray.length; i++) {
+            if (hintArray[i] === "_") {
+                hiddenIndexes.push(i);
+            }
+        }
+        var randomIndex = hiddenIndexes[Math.floor(Math.random() * hiddenIndexes.length)];
+        hintArray[randomIndex] = randomWord[randomIndex];
+        hintDisplay.textContent = "" + hintArray.join(" ");
+    }
+
+    hintCounter--;
+    if (hintCounter === 0) {
+        document.getElementById("hintButton").disabled = true;
+    }
+}
+
+    </script>
+</body>
+</html>
+<a href="https://www.instagram.com/vivi_growtopia" target="_blank">
+    <img src="https://cdn.discordapp.com/attachments/1014607274699931709/1127267633113354290/9k.png" alt="Instagram Icon" width="30" height="30">
+  </a>

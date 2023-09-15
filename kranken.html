@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pixel Art Creator</title>
+    <style>
+        body {
+    background-image: url('https://cdn.discordapp.com/attachments/1009898871461261332/1131687170906804304/image.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    padding: 0;
+    height: 90vh;
+}
+body.access-denied {
+            
+            background-image: url('https://cdn.discordapp.com/attachments/1009898871461261332/1136315091571183747/image.png');
+        }
+        body {
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #canvasContainer {
+            margin: 20px auto;
+            border: 1px solid black;
+            position: relative;
+        }
+
+        #canvas {
+            image-rendering: pixelated;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #uploadContainer {
+            margin: 20px auto;
+            border: 1px solid black;
+            position: relative;
+        }
+
+        #uploadedCanvas {
+            image-rendering: pixelated;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        button {
+            margin: 10px;
+        }
+
+        #pixelInfo {
+    right: 10px;
+    font-size: 50px !important;
+}
+
+        #uploadedInfo {
+            margin-top: 10px;
+            font-size: 50px !important;
+        }
+
+        #instagramIcon {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+        #textContainer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+     <button id="downloadRGBButton">Download RGB Colors CSV</button>
+    <div id="textContainer">
+        First use the pixel art creator , save the image and upload it to the see pixel info!
+    </div>
+    <h1>Pixel Art Creator</h1>
+    <label for="canvasSize">how many pixels?: </label>
+    <input type="number" id="canvasSize" value="20" min="1">
+    <div id="canvasContainer">
+        <canvas id="canvas"></canvas>
+    </div>
+    <button id="clearButton">Clear</button>
+    <button id="saveButton">Save</button>
+    <input type="file" id="fileInput" accept="image/*" onchange="handlePixelArtUpload(event)">
+    <div id="pixelInfo"></div>
+
+    <a href="https://instagram.com/vivi_growtopia" target="_blank" id="instagramIcon">
+        <img src="https://cdn.discordapp.com/attachments/1009898871461261332/1131679551236362351/768px-Instagram_icon.png" alt="Instagram" width="40" height="40">
+    </a>
+
+    <h1>See pixels info</h1>
+    <input type="file" id="uploadInput" accept="image/*" onchange="handleImageUpload(event)">
+    <div id="uploadContainer">
+        <canvas id="uploadedCanvas"></canvas>
+    </div>
+    <div id="uploadedInfo"></div>
+
+    <script>
+                //password
+                const correctPassword = 'viviontop';
+
+// Ask for the password when the website loads
+const enteredPassword = window.prompt('Please enter the password to access the website:');
+
+// Check if the entered password matches the correct password
+if (enteredPassword === correctPassword) {
+    // Password is correct, show the website content
+} else {
+    // Password is incorrect, show an error message and block access
+    alert('Incorrect password. Access denied.');
+    document.body.innerHTML = ''; // Clear the body content
+    document.body.classList.add('access-denied');
+
+}
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let canvasSize = 20;
+        const pixelInfo = document.getElementById('pixelInfo');
+
+        const uploadedCanvas = document.getElementById('uploadedCanvas');
+        const uploadedCtx = uploadedCanvas.getContext('2d');
+        const uploadedInfo = document.getElementById('uploadedInfo');
+
+        let initialPixelColors;
+
+        document.getElementById('canvasSize').addEventListener('change', (e) => {
+            canvasSize = e.target.value;
+            createGrid();
+        });
+
+        function createGrid() {
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const pixelSize = canvas.width / canvasSize;
+            for (let y = 0; y < canvasSize; y++) {
+                for (let x = 0; x < canvasSize; x++) {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+        }
+
+        function changeColor(e) {
+            const x = Math.floor((e.offsetX / uploadedCanvas.width) * uploadedCanvas.width);
+            const y = Math.floor((e.offsetY / uploadedCanvas.height) * uploadedCanvas.height);
+
+            const pixelIndex = y * uploadedCanvas.width + x;
+
+            if (initialPixelColors && initialPixelColors[pixelIndex]) {
+                const { r, g, b, a } = initialPixelColors[pixelIndex];
+                uploadedCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+                uploadedCtx.fillRect(x, y, 1, 1);
+                initialPixelColors[pixelIndex] = null;
+            } else {
+                const pixelColor = uploadedCtx.getImageData(x, y, 1, 1).data;
+                const r = pixelColor[0];
+                const g = pixelColor[1];
+                const b = pixelColor[2];
+                const a = pixelColor[3];
+
+                uploadedCtx.fillStyle = 'black';
+                uploadedCtx.fillRect(x, y, 1, 1);
+
+                if (!initialPixelColors) {
+                    initialPixelColors = [];
+                }
+                initialPixelColors[pixelIndex] = { r, g, b, a };
+            }
+        }
+
+        function showPixelInfo(e) {
+            const x = Math.floor((e.offsetX / canvas.width) * canvasSize);
+            const y = Math.floor((e.offsetY / canvas.height) * canvasSize);
+
+            const pixelColor = ctx.getImageData(x, y, 1, 1).data;
+            const r = pixelColor[0];
+            const g = pixelColor[1];
+            const b = pixelColor[2];
+
+            const rgb = `RGB: ${r}, ${g}, ${b}`;
+            pixelInfo.textContent = rgb;
+        }
+
+        function clearPixels() {
+            const pixelSize = canvas.width / canvasSize;
+            for (let y = 0; y < canvasSize; y++) {
+                for (let x = 0; x < canvasSize; x++) {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+        }
+
+        function savePixels() {
+            const pixelSize = canvas.width / canvasSize;
+            for (let y = 0; y < canvasSize; y++) {
+                for (let x = 0; x < canvasSize; x++) {
+                    const pixelColor = ctx.getImageData(x * pixelSize, y * pixelSize, 1, 1).data;
+                    const r = pixelColor[0];
+                    const g = pixelColor[1];
+                    const b = pixelColor[2];
+
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = canvas.toDataURL();
+            downloadLink.download = 'pixel_art_with_rgb.png';
+            downloadLink.click();
+
+            createGrid();
+        }
+
+        function handlePixelArtUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                const image = new Image();
+                image.src = reader.result;
+
+                image.onload = function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                };
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                const image = new Image();
+                image.src = reader.result;
+
+                image.onload = function () {
+                    const aspectRatio = image.width / image.height;
+
+                    uploadedCanvas.width = 1000;
+                    uploadedCanvas.height = 1000 / aspectRatio;
+                    uploadedCtx.clearRect(0, 0, uploadedCanvas.width, uploadedCanvas.height);
+                    uploadedCtx.imageSmoothingEnabled = false;
+                    uploadedCtx.drawImage(image, 0, 0, uploadedCanvas.width, uploadedCanvas.height);
+
+                    initialPixelColors = [];
+                };
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function showUploadedPixelInfo(e) {
+            const x = Math.floor((e.offsetX / uploadedCanvas.width) * uploadedCanvas.width);
+            const y = Math.floor((e.offsetY / uploadedCanvas.height) * uploadedCanvas.height);
+
+            const pixelColor = uploadedCtx.getImageData(x, y, 1, 1).data;
+            const r = pixelColor[0];
+            const g = pixelColor[1];
+            const b = pixelColor[2];
+
+            const rgb = `RGB: ${r}, ${g}, ${b}`;
+            uploadedInfo.textContent = rgb;
+        }
+
+        document.getElementById('clearButton').addEventListener('click', clearPixels);
+        document.getElementById('saveButton').addEventListener('click', savePixels);
+        canvas.addEventListener('mousemove', showPixelInfo);
+        canvas.addEventListener('mouseout', () => pixelInfo.textContent = '');
+
+        uploadedCanvas.addEventListener('mousemove', showUploadedPixelInfo);
+        uploadedCanvas.addEventListener('mouseout', () => uploadedInfo.textContent = '');
+        uploadedCanvas.addEventListener('click', changeColor);
+
+        createGrid();
+        let uploadedImageData; // Variable to store the pixel data of the uploaded image
+
+// Function to convert a number to a two-digit hexadecimal string
+function toHex(number) {
+    const hex = number.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+}
+
+// Function to download the RGB colors as a CSV file (Doesn't work yet)
+function downloadRGBColors() {
+    if (!uploadedImageData) {
+        alert('Please upload an image in the "Pixel Info" section first.');
+        return;
+    }
+
+    const rows = [];
+
+    // Create a canvas to read pixel data from the uploaded image
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = uploadedImageData.width;
+    tempCanvas.height = uploadedImageData.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(uploadedImageData, 0, 0);
+
+    for (let y = 0; y < uploadedImageData.height; y++) {
+        const row = [];
+        for (let x = 0; x < uploadedImageData.width; x++) {
+            const pixelColor = tempCtx.getImageData(x, y, 1, 1).data;
+            const r = pixelColor[0];
+            const g = pixelColor[1];
+            const b = pixelColor[2];
+
+            // Convert the RGB values to hexadecimal format (#RRGGBB)
+            const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            row.push(hexColor);
+        }
+        rows.push(row.join(','));
+    }
+
+    // Create the CSV content (Doesn't work)
+    const csvContent = 'data:text/csv;charset=utf-8,' + rows.join('\n');
+    const encodedUri = encodeURI(csvContent);
+
+    // Create a link and click it to initiate the download
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'rgb_colors.csv');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+
+    // Use a promise to ensure the download is triggered after all data is available
+    new Promise((resolve) => {
+        link.click();
+        resolve();
+    }).then(() => {
+        document.body.removeChild(link); // Remove the link element after the download
+    });
+}
+
+// Attach event listener to the download button
+document.getElementById('downloadRGBButton').addEventListener('click', downloadRGBColors);
+
+
+// Modify the handleImageUpload function to store the uploaded image data
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function () {
+        const image = new Image();
+        image.src = reader.result;
+
+        image.onload = function () {
+            const aspectRatio = image.width / image.height;
+
+            uploadedCanvas.width = 1000;
+            uploadedCanvas.height = 1000 / aspectRatio;
+            uploadedCtx.clearRect(0, 0, uploadedCanvas.width, uploadedCanvas.height);
+            uploadedCtx.imageSmoothingEnabled = false;
+            uploadedCtx.drawImage(image, 0, 0, uploadedCanvas.width, uploadedCanvas.height);
+
+            // Store the uploaded image data
+            uploadedImageData = uploadedCtx.getImageData(0, 0, uploadedCanvas.width, uploadedCanvas.height);
+
+            // Clear initial pixel colors when a new image is uploaded
+            initialPixelColors = [];
+        };
+    };
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+    </script>
+</body>
+</html>

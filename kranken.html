@@ -3,7 +3,6 @@
 <head>
     <title>Pixel Art Creator</title>
     <style>
-        /* General Reset and Styling */
         * {
             margin: 0;
             padding: 0;
@@ -77,8 +76,8 @@
 
         #pixelInfo, #uploadedInfo {
             margin-top: 15px;
-            font-size: 1.5rem; /* Larger text size */
-            font-weight: bold; /* Bold text */
+            font-size: 1.5rem;
+            font-weight: bold;
             color: #ffcccb;
         }
 
@@ -104,7 +103,6 @@
             background-color: #5ec285;
         }
 
-        /* Access Denied Styling */
         body.access-denied {
             display: flex;
             justify-content: center;
@@ -152,7 +150,6 @@
 </head>
 <body>
     <script>
-        // Password protection
         const correctPassword = 'viviontop';
 
         const enteredPassword = window.prompt('Please enter the password to access the website:');
@@ -188,7 +185,6 @@
     </div>
     <div id="uploadedInfo"></div>
 
-    <!-- Modal for instructions -->
     <div id="instructionModal">
         <button id="instructionModalClose">X</button>
         <h2>How to Use the Pixel Art Creator</h2>
@@ -207,9 +203,7 @@
     </div>
 
     <script>
-        // JavaScript code remains unchanged (your original code here)
 
-        // Modal handling
         const openInstructionsButton = document.getElementById('openInstructionsButton');
         const instructionModal = document.getElementById('instructionModal');
         const instructionModalClose = document.getElementById('instructionModalClose');
@@ -222,7 +216,7 @@
             instructionModal.style.display = 'none';
         });
 
-        // Existing functionality
+
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let canvasSize = 20;

@@ -75,7 +75,7 @@
             color: red;
         }
         .instagram-icon {
-    margin-top: -5px; /* Adjust this value to move the icon up or down */
+    margin-top: -5px; 
   }
     </style>
 </head>
@@ -310,8 +310,8 @@ document.getElementById("hintImage").src = randomImage;
 updateScore();
 
 function checkGuess() {
-    var guess = document.getElementById("guessInput").value.toLowerCase(); // Convert guess to lowercase
-    if (guess === randomWord.toLowerCase()) { // Convert randomWord to lowercase
+    var guess = document.getElementById("guessInput").value.toLowerCase(); 
+    if (guess === randomWord.toLowerCase()) { 
         alert("Congratulations! You guessed the world correctly.");
         score++;
         updateScore();
